@@ -40,6 +40,48 @@ app.get("/file/:name", (req, res) => {
   }
 });
 
+// Login system (simple JSON file)
+app.post("/login", (req, res) => {
+  const { username, password } = req.body;
+
+  const usersPath = path.join(__dirname, "users.json");
+  if (!fs.existsSync(usersPath)) {
+    return res.status(500).json({ success: false, message: "Users file missing" });
+  }
+
+  const users = JSON.parse(fs.readFileSync(usersPath, "utf8"));
+
+  const user = users.find(
+    (u) => u.username === username && u.password === password
+  );
+
+  if (user) {
+    res.json({ success: true });
+  } else {
+    res.json({ success: false, message: "Invalid username or password" });
+  }
+});
+
+// Delete file
+app.delete("/file/:name", (req, res) => {
+  const filePath = path.join(uploadFolder, req.params.name);
+  if (fs.existsSync(filePath)) {
+    fs.unlinkSync(filePath);
+    res.json({ success: true });
+  } else {
+    res.status(404).json({ success: false, message: "File not found" });
+  }
+});
+
+// Replace file
+app.post("/replace/:name", upload.single("file"), (req, res) => {
+  const oldFile = path.join(uploadFolder, req.params.name);
+  if (fs.existsSync(oldFile)) {
+    fs.unlinkSync(oldFile);
+  }
+  res.json({ success: true, message: "File replaced" });
+});
+
 // Render uses dynamic port
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log("Server running on port " + PORT));
