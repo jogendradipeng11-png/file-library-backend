@@ -1,0 +1,8 @@
+[
+  {
+    "id": 1,
+    "username": "admin",
+    "password": "$2a$10$someveryLongBcryptHashHere==",
+    "role": "admin"
+  }
+]
